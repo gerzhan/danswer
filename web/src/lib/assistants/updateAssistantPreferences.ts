@@ -1,4 +1,6 @@
-async function updateUserAssistantList(
+"use client";
+
+export async function updateUserAssistantList(
   chosenAssistants: number[]
 ): Promise<boolean> {
   const response = await fetch("/api/user/assistant-list", {
@@ -11,24 +13,33 @@ async function updateUserAssistantList(
 
   return response.ok;
 }
+export async function updateAssistantVisibility(
+  assistantId: number,
+  show: boolean
+): Promise<boolean> {
+  const response = await fetch(
+    `/api/user/assistant-list/update/${assistantId}?show=${show}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.ok;
+}
 
 export async function removeAssistantFromList(
-  assistantId: number,
-  chosenAssistants: number[]
+  assistantId: number
 ): Promise<boolean> {
-  const updatedAssistants = chosenAssistants.filter((id) => id !== assistantId);
-  return updateUserAssistantList(updatedAssistants);
+  return updateAssistantVisibility(assistantId, false);
 }
 
 export async function addAssistantToList(
-  assistantId: number,
-  chosenAssistants: number[]
+  assistantId: number
 ): Promise<boolean> {
-  if (!chosenAssistants.includes(assistantId)) {
-    const updatedAssistants = [...chosenAssistants, assistantId];
-    return updateUserAssistantList(updatedAssistants);
-  }
-  return false;
+  return updateAssistantVisibility(assistantId, true);
 }
 
 export async function moveAssistantUp(
@@ -60,3 +71,16 @@ export async function moveAssistantDown(
   }
   return false;
 }
+
+export const reorderPinnedAssistants = async (
+  assistantIds: number[]
+): Promise<boolean> => {
+  const response = await fetch(`/api/user/pinned-assistants`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ordered_assistant_ids: assistantIds }),
+  });
+  return response.ok;
+};

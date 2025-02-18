@@ -2,18 +2,22 @@
 
 import { useState } from "react";
 import { FeedbackType } from "../types";
-import { FiThumbsDown, FiThumbsUp } from "react-icons/fi";
-import { ModalWrapper } from "./ModalWrapper";
+import { Modal } from "@/components/Modal";
+import { FilledLikeIcon } from "@/components/icons/icons";
 
-const predefinedPositiveFeedbackOptions =
-  process.env.NEXT_PUBLIC_POSITIVE_PREDEFINED_FEEDBACK_OPTIONS?.split(",") ||
-  [];
-const predefinedNegativeFeedbackOptions =
-  process.env.NEXT_PUBLIC_NEGATIVE_PREDEFINED_FEEDBACK_OPTIONS?.split(",") || [
-    "Retrieved documents were not relevant",
-    "AI misread the documents",
-    "Cited source had incorrect information",
-  ];
+const predefinedPositiveFeedbackOptions = process.env
+  .NEXT_PUBLIC_POSITIVE_PREDEFINED_FEEDBACK_OPTIONS
+  ? process.env.NEXT_PUBLIC_POSITIVE_PREDEFINED_FEEDBACK_OPTIONS.split(",")
+  : [];
+
+const predefinedNegativeFeedbackOptions = process.env
+  .NEXT_PUBLIC_NEGATIVE_PREDEFINED_FEEDBACK_OPTIONS
+  ? process.env.NEXT_PUBLIC_NEGATIVE_PREDEFINED_FEEDBACK_OPTIONS.split(",")
+  : [
+      "Retrieved documents were not relevant",
+      "AI misread the documents",
+      "Cited source had incorrect information",
+    ];
 
 interface FeedbackModalProps {
   feedbackType: FeedbackType;
@@ -49,30 +53,38 @@ export const FeedbackModal = ({
       : predefinedNegativeFeedbackOptions;
 
   return (
-    <ModalWrapper onClose={onClose} modalClassName="max-w-5xl">
+    <Modal onOutsideClick={onClose} width="w-full max-w-3xl">
       <>
-        <h2 className="text-2xl text-emphasis font-bold mb-4 flex">
+        <h2 className="text-2xl text-text-darker font-bold mb-4 flex">
           <div className="mr-1 my-auto">
             {feedbackType === "like" ? (
-              <FiThumbsUp className="text-green-500 my-auto mr-2" />
+              <FilledLikeIcon
+                size={20}
+                className="text-green-600 my-auto mr-2"
+              />
             ) : (
-              <FiThumbsDown className="text-red-600 my-auto mr-2" />
+              <FilledLikeIcon
+                size={20}
+                className="rotate-180 text-red-600 my-auto mr-2"
+              />
             )}
           </div>
           Provide additional feedback
         </h2>
+
         <div className="mb-4 flex flex-wrap justify-start">
           {predefinedFeedbackOptions.map((feedback, index) => (
             <button
               key={index}
-              className={`bg-border hover:bg-hover text-default py-2 px-4 rounded m-1 
-                ${predefinedFeedback === feedback && "ring-2 ring-accent"}`}
+              className={`bg-background-dark hover:bg-accent-background-hovered text-default py-2 px-4 rounded m-1 
+                ${predefinedFeedback === feedback && "ring-2 ring-accent/20"}`}
               onClick={() => handlePredefinedFeedback(feedback)}
             >
               {feedback}
             </button>
           ))}
         </div>
+
         <textarea
           autoFocus
           className={`
@@ -94,15 +106,16 @@ export const FeedbackModal = ({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
+
         <div className="flex mt-2">
           <button
-            className="bg-accent text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none mx-auto"
+            className="bg-agent text-white py-2 px-4 rounded hover:bg-agent/50 focus:outline-none mx-auto"
             onClick={handleSubmit}
           >
             Submit feedback
           </button>
         </div>
       </>
-    </ModalWrapper>
+    </Modal>
   );
 };

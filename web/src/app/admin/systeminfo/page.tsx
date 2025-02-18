@@ -15,13 +15,12 @@ const Page = async () => {
 
   return (
     <div>
-      <div className="border-solid border-gray-600 border-b pb-2 mb-4 flex">
+      <div className="border-solid border-background-600 border-b pb-2 mb-4 flex">
         <NotebookIcon size={32} />
         <h1 className="text-3xl font-bold pl-2">Version</h1>
       </div>
 
       <div>
-        <p className="font-bold text-lg my-auto mb-2">Danswer MIT</p>
         <div className="flex mb-2">
           <p className="my-auto mr-1">Backend Version: </p>
           <p className="text-base my-auto text-slate-400 italic">

@@ -4,7 +4,7 @@ export function DeleteButton({
   onClick,
   disabled,
 }: {
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void | Promise<void>;
   disabled?: boolean;
 }) {
   return (
@@ -13,7 +13,11 @@ export function DeleteButton({
         my-auto 
         flex 
         mb-1 
-        ${disabled ? "cursor-default" : "hover:bg-hover cursor-pointer"} 
+        ${
+          disabled
+            ? "cursor-default"
+            : "hover:bg-accent-background-hovered cursor-pointer"
+        } 
         w-fit 
         p-2 
         rounded-lg

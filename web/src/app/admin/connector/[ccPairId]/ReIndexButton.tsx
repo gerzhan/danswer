@@ -1,13 +1,12 @@
 "use client";
 
 import { PopupSpec, usePopup } from "@/components/admin/connectors/Popup";
-import { runConnector } from "@/lib/connector";
-import { Button, Divider, Text } from "@tremor/react";
-import { useRouter } from "next/navigation";
-import { mutate } from "swr";
-import { buildCCPairInfoUrl } from "./lib";
+import { Button } from "@/components/ui/button";
+import Text from "@/components/ui/text";
+import { triggerIndexing } from "./lib";
 import { useState } from "react";
 import { Modal } from "@/components/Modal";
+import { Separator } from "@/components/ui/separator";
 
 function ReIndexPopup({
   connectorId,
@@ -22,35 +21,20 @@ function ReIndexPopup({
   setPopup: (popupSpec: PopupSpec | null) => void;
   hide: () => void;
 }) {
-  async function triggerIndexing(fromBeginning: boolean) {
-    const errorMsg = await runConnector(
-      connectorId,
-      [credentialId],
-      fromBeginning
-    );
-    if (errorMsg) {
-      setPopup({
-        message: errorMsg,
-        type: "error",
-      });
-    } else {
-      setPopup({
-        message: "Triggered connector run",
-        type: "success",
-      });
-    }
-    mutate(buildCCPairInfoUrl(ccPairId));
-  }
-
   return (
     <Modal title="Run Indexing" onOutsideClick={hide}>
       <div>
         <Button
+          variant="submit"
           className="ml-auto"
-          color="green"
-          size="xs"
           onClick={() => {
-            triggerIndexing(false);
+            triggerIndexing(
+              false,
+              connectorId,
+              credentialId,
+              ccPairId,
+              setPopup
+            );
             hide();
           }}
         >
@@ -62,14 +46,19 @@ function ReIndexPopup({
           have been added since the last successful indexing run.
         </Text>
 
-        <Divider />
+        <Separator />
 
         <Button
+          variant="submit"
           className="ml-auto"
-          color="green"
-          size="xs"
           onClick={() => {
-            triggerIndexing(true);
+            triggerIndexing(
+              true,
+              connectorId,
+              credentialId,
+              ccPairId,
+              setPopup
+            );
             hide();
           }}
         >
@@ -95,11 +84,15 @@ export function ReIndexButton({
   connectorId,
   credentialId,
   isDisabled,
+  isIndexing,
+  isDeleting,
 }: {
   ccPairId: number;
   connectorId: number;
   credentialId: number;
   isDisabled: boolean;
+  isIndexing: boolean;
+  isDeleting: boolean;
 }) {
   const { popup, setPopup } = usePopup();
   const [reIndexPopupVisible, setReIndexPopupVisible] = useState(false);
@@ -117,20 +110,23 @@ export function ReIndexButton({
       )}
       {popup}
       <Button
-        className="ml-auto"
-        color="green"
-        size="xs"
+        variant="success-reverse"
+        className="ml-auto min-w-[100px]"
         onClick={() => {
           setReIndexPopupVisible(true);
         }}
-        disabled={isDisabled}
+        disabled={isDisabled || isDeleting}
         tooltip={
-          isDisabled
-            ? "Connector must be active in order to run indexing"
-            : undefined
+          isDeleting
+            ? "Cannot index while connector is deleting"
+            : isIndexing
+              ? "Indexing is already in progress"
+              : isDisabled
+                ? "Connector must be re-enabled before indexing"
+                : undefined
         }
       >
-        Run Indexing
+        Index
       </Button>
     </>
   );

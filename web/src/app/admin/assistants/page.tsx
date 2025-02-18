@@ -1,30 +1,15 @@
 import { PersonasTable } from "./PersonaTable";
-import { FiPlusSquare } from "react-icons/fi";
-import Link from "next/link";
-import { Divider, Text, Title } from "@tremor/react";
-import { fetchSS } from "@/lib/utilsSS";
-import { ErrorCallout } from "@/components/ErrorCallout";
-import { Persona } from "./interfaces";
-import { RobotIcon } from "@/components/icons/icons";
+import Text from "@/components/ui/text";
+import Title from "@/components/ui/title";
+import { Separator } from "@/components/ui/separator";
+import { AssistantsIcon } from "@/components/icons/icons";
 import { AdminPageTitle } from "@/components/admin/Title";
-
+import { SubLabel } from "@/components/admin/connectors/Field";
+import CreateButton from "@/components/ui/createButton";
 export default async function Page() {
-  const personaResponse = await fetchSS("/admin/persona");
-
-  if (!personaResponse.ok) {
-    return (
-      <ErrorCallout
-        errorTitle="Something went wrong :("
-        errorMsg={`Failed to fetch personas - ${await personaResponse.text()}`}
-      />
-    );
-  }
-
-  const personas = (await personaResponse.json()) as Persona[];
-
   return (
     <div className="mx-auto container">
-      <AdminPageTitle icon={<RobotIcon size={32} />} title="Assistants" />
+      <AdminPageTitle icon={<AssistantsIcon size={32} />} title="Assistants" />
 
       <Text className="mb-2">
         Assistants are a way to build custom search/question-answering
@@ -41,23 +26,21 @@ export default async function Page() {
       </div>
 
       <div>
-        <Divider />
+        <Separator />
 
         <Title>Create an Assistant</Title>
-        <Link
-          href="/admin/assistants/new"
-          className="flex py-2 px-4 mt-2 border border-border h-fit cursor-pointer hover:bg-hover text-sm w-40"
-        >
-          <div className="mx-auto flex">
-            <FiPlusSquare className="my-auto mr-2" />
-            New Assistant
-          </div>
-        </Link>
+        <CreateButton href="/assistants/new?admin=true" text="New Assistant" />
 
-        <Divider />
+        <Separator />
 
         <Title>Existing Assistants</Title>
-        <PersonasTable personas={personas} />
+        <SubLabel>
+          Assistants will be displayed as options on the Chat / Search
+          interfaces in the order they are displayed below. Assistants marked as
+          hidden will not be displayed. Editable assistants are shown at the
+          top.
+        </SubLabel>
+        <PersonasTable />
       </div>
     </div>
   );

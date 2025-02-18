@@ -1,14 +1,20 @@
 "use client";
 
-import { Button } from "@tremor/react";
-import { CCPairFullInfo } from "./types";
+import { Button } from "@/components/ui/button";
+import { CCPairFullInfo, ConnectorCredentialPairStatus } from "./types";
 import { usePopup } from "@/components/admin/connectors/Popup";
 import { FiTrash } from "react-icons/fi";
 import { deleteCCPair } from "@/lib/documentDeletion";
 import { mutate } from "swr";
 import { buildCCPairInfoUrl } from "./lib";
 
-export function DeletionButton({ ccPair }: { ccPair: CCPairFullInfo }) {
+export function DeletionButton({
+  ccPair,
+  refresh,
+}: {
+  ccPair: CCPairFullInfo;
+  refresh: () => void;
+}) {
   const { popup, setPopup } = usePopup();
 
   const isDeleting =
@@ -16,7 +22,7 @@ export function DeletionButton({ ccPair }: { ccPair: CCPairFullInfo }) {
     ccPair?.latest_deletion_attempt?.status === "STARTED";
 
   let tooltip: string;
-  if (ccPair.connector.disabled) {
+  if (ccPair.status !== ConnectorCredentialPairStatus.ACTIVE) {
     if (isDeleting) {
       tooltip = "This connector is currently being deleted";
     } else {
@@ -30,21 +36,30 @@ export function DeletionButton({ ccPair }: { ccPair: CCPairFullInfo }) {
     <div>
       {popup}
       <Button
-        size="xs"
-        color="red"
-        onClick={() =>
-          deleteCCPair(
-            ccPair.connector.id,
-            ccPair.credential.id,
-            setPopup,
-            () => mutate(buildCCPairInfoUrl(ccPair.id))
-          )
-        }
+        variant="destructive"
+        onClick={async () => {
+          try {
+            // Await the delete operation to ensure it completes
+            await deleteCCPair(
+              ccPair.connector.id,
+              ccPair.credential.id,
+              setPopup,
+              () => mutate(buildCCPairInfoUrl(ccPair.id))
+            );
+
+            // Call refresh to update the state after deletion
+            refresh();
+          } catch (error) {
+            console.error("Error deleting connector:", error);
+          }
+        }}
         icon={FiTrash}
-        disabled={!ccPair.connector.disabled || isDeleting}
+        disabled={
+          ccPair.status === ConnectorCredentialPairStatus.ACTIVE || isDeleting
+        }
         tooltip={tooltip}
       >
-        Schedule for Deletion
+        Delete
       </Button>
     </div>
   );

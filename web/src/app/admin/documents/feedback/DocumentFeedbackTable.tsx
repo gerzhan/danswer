@@ -1,14 +1,13 @@
-import { BasicTable } from "@/components/admin/connectors/BasicTable";
 import { usePopup } from "@/components/admin/connectors/Popup";
 import { useState } from "react";
 import {
   Table,
   TableHead,
   TableRow,
-  TableHeaderCell,
+  TableHeader,
   TableBody,
   TableCell,
-} from "@tremor/react";
+} from "@/components/ui/table";
 import { PageSelector } from "@/components/PageSelector";
 import { DocumentBoostStatus } from "@/lib/types";
 import { updateHiddenStatus } from "../lib";
@@ -38,7 +37,7 @@ const IsVisibleSection = ({
               );
               onUpdate(response);
             }}
-            className="flex text-error cursor-pointer hover:bg-hover py-1 px-2 w-fit rounded-full"
+            className="flex text-error cursor-pointer hover:bg-accent-background-hovered py-1 px-2 w-fit rounded-full"
           >
             <div className="select-none">Hidden</div>
             <div className="ml-1 my-auto">
@@ -54,7 +53,7 @@ const IsVisibleSection = ({
               );
               onUpdate(response);
             }}
-            className="flex cursor-pointer hover:bg-hover py-1 px-2 w-fit rounded-full"
+            className="flex cursor-pointer hover:bg-accent-background-hovered py-1 px-2 w-fit rounded-full"
           >
             <div className="my-auto select-none">Visible</div>
             <div className="ml-1 my-auto">
@@ -95,13 +94,13 @@ export const DocumentFeedbackTable = ({
   return (
     <div>
       <Table className="overflow-visible">
-        <TableHead>
+        <TableHeader>
           <TableRow>
-            <TableHeaderCell>Document Name</TableHeaderCell>
-            <TableHeaderCell>Is Searchable?</TableHeaderCell>
-            <TableHeaderCell>Score</TableHeaderCell>
+            <TableHead>Document Name</TableHead>
+            <TableHead>Is Searchable?</TableHead>
+            <TableHead>Score</TableHead>
           </TableRow>
-        </TableHead>
+        </TableHeader>
         <TableBody>
           {documents
             .slice((page - 1) * numToDisplay, page * numToDisplay)
@@ -136,7 +135,7 @@ export const DocumentFeedbackTable = ({
                     />
                   </TableCell>
                   <TableCell>
-                    <div className="ml-auto flex w-16">
+                    <div className="relative">
                       <div
                         key={document.document_id}
                         className="h-10 ml-auto mr-8"
